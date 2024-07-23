@@ -8,7 +8,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+    environment:
+      name: staging
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
@@ -27,9 +28,16 @@ jobs:
         run: |
           poetry install
 
-      - name: Set PYTHONPATH
-        run: echo "PYTHONPATH=src" >> $GITHUB_ENV
+      - name: Setup environment variables
+        env:
+          PYTHONPATH: src
+          ENV_VAR: ${{ vars.ENV_VAR }}
+          SECRET_VAR: ${{ secrets.SECRET_VAR }}
+        run: |
+          echo "PYTHONPATH=$PYTHONPATH" >> $GITHUB_ENV && \
+          echo "ENV_VAR=$ENV_VAR" >> $GITHUB_ENV && \
+          echo "SECRET_VAR=$SECRET_VAR" >> $GITHUB_ENV
       
       - name: Run tests
         run: |
-          poetry run pytest
+            poetry run pytest
